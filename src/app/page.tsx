@@ -15,6 +15,7 @@ import {
   Heart,
   ChevronRight
 } from "@/components/Icons";
+import HeroFoodSlider from "@/components/HeroFoodSlider";
 import { STORE_INFO, CATEGORIES, MENU_ITEMS } from "@/data/menu";
 
 export default function HomePage() {
@@ -30,35 +31,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Left Text */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            {/* Official Logo & Address Card */}
-            <div className="inline-flex flex-col sm:flex-row items-center sm:items-center gap-4 p-3.5 sm:p-4 rounded-2xl bg-black/40 border border-amber-400/30 backdrop-blur-md shadow-xl text-left">
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-md shrink-0">
-                <Image
-                  src="/logo.png"
-                  alt="The Kiltan Cafe Logo"
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                  priority
-                />
-              </div>
-              <div className="space-y-1 text-center sm:text-left">
-                <div className="flex items-center justify-center sm:justify-start gap-2">
-                  <span className="text-base sm:text-lg font-black tracking-tight text-white">
-                    THE KILTAN CAFE
-                  </span>
-                  <span className="text-[10px] bg-amber-400/20 text-amber-300 font-extrabold px-2 py-0.5 rounded-full border border-amber-400/40">
-                    Kalka
-                  </span>
-                </div>
-                <p className="text-xs font-bold text-amber-300 flex items-center justify-center sm:justify-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)</span>
-                </p>
-                <p className="text-[11px] text-stone-300 font-medium">
-                  📞 91385-28287, 99914-28287 • Open Daily: 10:30 AM - 10:30 PM
-                </p>
-              </div>
+            {/* Mountain Fresh Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-bold shadow-inner">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Shop No. 34, S.D Market, Kalka • 100% Wholesome Flavours</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none">
@@ -120,61 +96,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Visual Food Collage */}
+          {/* Right Visual Food Collage (2-Second Auto-Rotating Food Slider) */}
           <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-sm sm:max-w-md">
-              {/* Main Card */}
-              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 bg-stone-800 group">
-                <div className="relative h-72 sm:h-80 w-full overflow-hidden">
-                  <Image
-                    src="/images/CHEESE BURGER.jpeg"
-                    alt="The Kiltan Cafe Signature Burger"
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-500"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent opacity-80" />
-                  <div className="absolute top-4 left-4 bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                    <span>Chef's Masterpiece</span>
-                  </div>
-                </div>
-
-                <div className="p-5 bg-stone-900 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-extrabold text-white">
-                      Cheese Delight Burger Combo
-                    </h3>
-                    <span className="text-lg font-black text-amber-400">₹235</span>
-                  </div>
-                  <p className="text-xs text-stone-400">
-                    Hand-crafted cheesy patty with golden peri-peri fries & free Coke can.
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating Badge 1 */}
-              <div className="absolute -top-4 -right-4 bg-white text-stone-900 p-3 rounded-2xl shadow-xl flex items-center gap-2.5 border border-stone-200">
-                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
-                  🍕
-                </div>
-                <div className="text-left">
-                  <p className="text-[10px] text-stone-500 font-semibold uppercase">100% Real</p>
-                  <p className="text-xs font-black">Mozzarella Pizza</p>
-                </div>
-              </div>
-
-              {/* Floating Badge 2 */}
-              <div className="absolute -bottom-4 -left-4 bg-emerald-600 text-white p-3 rounded-2xl shadow-xl flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-xs">
-                  🛵
-                </div>
-                <div className="text-left">
-                  <p className="text-[10px] text-emerald-200 font-semibold">Delivery Range</p>
-                  <p className="text-xs font-black">Up to 50 KM</p>
-                </div>
-              </div>
-            </div>
+            <HeroFoodSlider />
           </div>
         </div>
       </section>
