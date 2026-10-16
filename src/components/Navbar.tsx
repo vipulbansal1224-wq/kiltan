@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Menu,
@@ -50,7 +51,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-emerald-200">
               <MapPin className="w-3.5 h-3.5 text-amber-400" />
-              <span>Shop No. 34, S.D Market, Kalka, Haryana</span>
+              <span>SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)</span>
             </span>
             <span className="text-emerald-500">•</span>
             <span className="flex items-center gap-1.5 text-emerald-100">
@@ -64,10 +65,10 @@ export default function Navbar() {
             </span>
             <a
               href={`tel:${STORE_INFO.phone}`}
-              className="hover:text-amber-300 transition flex items-center gap-1 font-bold"
+              className="hover:text-amber-300 transition flex items-center gap-1.5 font-bold"
             >
-              <Phone className="w-3 h-3" />
-              <span>{STORE_INFO.phone}</span>
+              <Phone className="w-3 h-3 text-amber-400" />
+              <span>91385-28287 / 99914-28287</span>
             </a>
           </div>
         </div>
@@ -82,17 +83,24 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center font-black text-lg shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
-              <UtensilsCrossed className="w-5 h-5 text-amber-300" />
+          {/* Brand Logo with Address Below */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-stone-900 border-2 border-amber-400/70 shadow-md group-hover:scale-105 transition-transform shrink-0">
+              <Image
+                src="/logo.png"
+                alt="The Kiltan Cafe Logo"
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
-            <div>
-              <span className="text-lg font-black tracking-tight text-stone-900 group-hover:text-emerald-700 transition">
+            <div className="flex flex-col text-left">
+              <span className="text-base sm:text-lg font-black tracking-tight text-stone-900 group-hover:text-emerald-700 transition leading-tight">
                 The Kiltan Cafe
               </span>
-              <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                Kalka • S.D Market
+              <p className="text-[10px] font-semibold text-emerald-800 leading-tight">
+                Shop No. 34, S.D Market, Opposite Housing Board, Kalka (133302)
               </p>
             </div>
           </Link>

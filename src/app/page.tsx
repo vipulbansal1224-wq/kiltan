@@ -30,9 +30,35 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Left Text */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Kalka's Premier Food & Hangout Destination</span>
+            {/* Official Logo & Address Card */}
+            <div className="inline-flex flex-col sm:flex-row items-center sm:items-center gap-4 p-3.5 sm:p-4 rounded-2xl bg-black/40 border border-amber-400/30 backdrop-blur-md shadow-xl text-left">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-md shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="The Kiltan Cafe Logo"
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+              </div>
+              <div className="space-y-1 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <span className="text-base sm:text-lg font-black tracking-tight text-white">
+                    THE KILTAN CAFE
+                  </span>
+                  <span className="text-[10px] bg-amber-400/20 text-amber-300 font-extrabold px-2 py-0.5 rounded-full border border-amber-400/40">
+                    Kalka
+                  </span>
+                </div>
+                <p className="text-xs font-bold text-amber-300 flex items-center justify-center sm:justify-start gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)</span>
+                </p>
+                <p className="text-[11px] text-stone-300 font-medium">
+                  📞 91385-28287, 99914-28287 • Open Daily: 10:30 AM - 10:30 PM
+                </p>
+              </div>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none">
@@ -43,7 +69,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-stone-300 text-sm sm:text-base max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Step into The Kiltan Cafe at S.D Market, Kalka. Enjoy 110+ gourmet pizzas, crispy burgers, authentic pasta, Belgian waffles, thick shakes and Punjabi kulhad beverages made with 100% fresh ingredients and zero hidden charges.
+              Step into The Kiltan Cafe opposite Housing Board, S.D Market, Kalka. Enjoy 110+ gourmet pizzas, crispy burgers, authentic pasta, Belgian waffles, thick shakes and Punjabi beverages made with 100% fresh ingredients and zero hidden charges.
             </p>
 
             {/* CTAs */}
@@ -381,7 +407,7 @@ export default function HomePage() {
             <div>
               <p className="text-xs text-stone-500 font-bold uppercase">Location</p>
               <p className="text-sm font-black text-stone-900">Shop No. 34, S.D Market</p>
-              <p className="text-xs text-stone-600">Kalka, Haryana - 133302</p>
+              <p className="text-xs text-stone-600">Opp. Housing Board, Kalka (133302)</p>
             </div>
           </div>
 

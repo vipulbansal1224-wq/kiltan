@@ -95,13 +95,38 @@ function MenuContent() {
       {/* Menu Header Banner */}
       <div className="bg-gradient-to-r from-emerald-950 via-stone-900 to-emerald-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-stone-800">
         <div className="max-w-7xl mx-auto space-y-4 text-center">
+          {/* Logo & Address */}
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-xl">
+              <Image
+                src="/logo.png"
+                alt="The Kiltan Cafe Logo"
+                width={80}
+                height={80}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                The Kiltan Cafe
+              </h2>
+              <p className="text-xs font-bold text-amber-300">
+                SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)
+              </p>
+              <p className="text-[11px] text-stone-300">
+                Order Helpline: 📞 91385-28287, 99914-28287
+              </p>
+            </div>
+          </div>
+
           <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1 rounded-full text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>110 Handcrafted Dishes • Zero Extra Fee</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight">
-            The Kiltan Cafe Menu 2026
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+            Official Menu & Direct Order Dispatch
           </h1>
 
           <p className="text-xs sm:text-sm text-stone-300 max-w-2xl mx-auto leading-relaxed">

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Bike,
   ShieldCheck,
@@ -79,9 +80,29 @@ export default function DeliveryPage() {
       {/* 1. HERO BANNER */}
       <section className="bg-gradient-to-r from-emerald-950 via-teal-950 to-stone-950 text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-b border-stone-800">
         <div className="max-w-7xl mx-auto space-y-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-            <Bike className="w-4 h-4 text-amber-400" />
-            <span>Zero-Fee Food Delivery Platform</span>
+          {/* Logo & Kitchen Hub */}
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-2xl">
+              <Image
+                src="/logo.png"
+                alt="The Kiltan Cafe Emblem"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                The Kiltan Cafe Delivery Hub
+              </h2>
+              <p className="text-xs sm:text-sm font-bold text-amber-300">
+                SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)
+              </p>
+              <p className="text-xs text-stone-300">
+                Kitchen Dispatch: 📞 91385-28287, 99914-28287 • Up to 50 KM Direct Delivery
+              </p>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight max-w-3xl mx-auto leading-tight">

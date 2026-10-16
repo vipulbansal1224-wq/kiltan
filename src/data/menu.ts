@@ -97,16 +97,21 @@ export const CATEGORIES: CategoryInfo[] = [
 export const STORE_INFO = {
   name: "The Kiltan Cafe",
   tagline: "Kalka's Premier Food & Hangout Destination",
-  address: "Shop No. 34, S.D Market, Kalka, Haryana - 133302",
+  address: "Shop No. 34, S.D Market, Opposite Housing Board, Kalka, Haryana (133302)",
+  addressShort: "Shop No. 34, S.D Market, Opp. Housing Board, Kalka",
   phone: "+91 91385-28287",
+  phoneSecondary: "+91 99914-28287",
+  phones: ["91385-28287", "99914-28287"],
   phoneRaw: "919138528287",
+  instagram: "thekiltancafekalka",
+  instagramUrl: "https://www.instagram.com/thekiltancafekalka",
   email: "thekiltancafe@gmail.com",
   hours: "Mon - Sun: 10:30 AM - 10:30 PM",
   fssai: "10024000000000",
   gstin: "03AAAAA0000A1Z5",
   deliveryUrl: "https://ludhcloud.online/delivery/",
   coords: { lat: 30.8355, lng: 76.9366 },
-  googleMapsUrl: "https://maps.google.com/?q=The+Kiltan+Cafe+Kalka",
+  googleMapsUrl: "https://maps.google.com/?q=The+Kiltan+Cafe+Shop+No+34+SD+Market+Kalka",
   aboutShort: "Founded in the foothills of Kalka, The Kiltan Cafe brings mouth-watering gourmet pizzas, crispy burgers, loaded sandwiches, thick shakes, and fresh meals crafted with 100% hygienic care and zero hidden charges."
 };
 

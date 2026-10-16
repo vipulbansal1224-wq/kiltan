@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   MapPin,
   Phone,
@@ -48,9 +49,29 @@ export default function ContactPage() {
       {/* 1. HERO BANNER */}
       <section className="bg-gradient-to-r from-emerald-950 via-stone-900 to-teal-950 text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-b border-stone-800">
         <div className="max-w-7xl mx-auto space-y-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-            <Calendar className="w-3.5 h-3.5 text-amber-400" />
-            <span>Table Reservations & Inquiries</span>
+          {/* Logo & Address */}
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-2xl">
+              <Image
+                src="/logo.png"
+                alt="The Kiltan Cafe Emblem"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                The Kiltan Cafe
+              </h2>
+              <p className="text-xs sm:text-sm font-bold text-amber-300">
+                SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)
+              </p>
+              <p className="text-xs text-stone-300">
+                📞 91385-28287, 99914-28287 • Open 10:30 AM – 10:30 PM Daily
+              </p>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight max-w-3xl mx-auto leading-tight">
@@ -238,9 +259,25 @@ export default function ContactPage() {
           {/* Right: Direct Contact & Hours */}
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-5">
-              <h3 className="text-base font-extrabold text-stone-900 border-b border-stone-100 pb-3">
-                Cafe Details & Helpline
-              </h3>
+              <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-md shrink-0">
+                  <Image
+                    src="/logo.png"
+                    alt="The Kiltan Cafe"
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-stone-900">
+                    The Kiltan Cafe
+                  </h3>
+                  <p className="text-[11px] text-emerald-700 font-semibold">
+                    Shop No. 34, S.D Market, Kalka
+                  </p>
+                </div>
+              </div>
 
               <div className="space-y-4 text-xs">
                 <div className="flex items-start gap-3">
@@ -248,12 +285,12 @@ export default function ContactPage() {
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-extrabold text-stone-900">Address</p>
-                    <p className="text-stone-600 mt-0.5 leading-relaxed">
-                      {STORE_INFO.address}
+                    <p className="font-extrabold text-stone-900">Full Cafe Address</p>
+                    <p className="text-stone-700 mt-0.5 leading-relaxed font-semibold">
+                      SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)
                     </p>
                     <p className="text-[10px] text-stone-400 mt-0.5">
-                      (Opposite S.D Mandir, 3 mins from Kalka Railway Station)
+                      (Opposite Housing Board, Near Kalka Railway Station)
                     </p>
                   </div>
                 </div>
@@ -263,13 +300,12 @@ export default function ContactPage() {
                     <Phone className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-extrabold text-stone-900">Direct Telephone</p>
-                    <a
-                      href={`tel:${STORE_INFO.phone}`}
-                      className="text-emerald-700 font-mono font-bold hover:underline"
-                    >
-                      {STORE_INFO.phone}
-                    </a>
+                    <p className="font-extrabold text-stone-900">Direct Telephone / Helpline</p>
+                    <div className="flex items-center gap-2 mt-0.5 text-emerald-700 font-mono font-bold">
+                      <a href="tel:9138528287" className="hover:underline">91385-28287</a>
+                      <span>/</span>
+                      <a href="tel:9991428287" className="hover:underline">99914-28287</a>
+                    </div>
                     <p className="text-[10px] text-stone-400">Available 10:30 AM – 10:30 PM</p>
                   </div>
                 </div>

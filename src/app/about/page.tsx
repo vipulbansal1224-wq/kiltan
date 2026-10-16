@@ -27,9 +27,29 @@ export default function AboutPage() {
       {/* 1. HERO BANNER */}
       <section className="bg-gradient-to-r from-emerald-950 via-stone-900 to-stone-950 text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-b border-stone-800 relative overflow-hidden">
         <div className="max-w-7xl mx-auto space-y-6 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-            <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
-            <span>Born in the Foothills of Kalka</span>
+          {/* Logo & Address Card */}
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-stone-950 border-2 border-amber-400 shadow-2xl">
+              <Image
+                src="/logo.png"
+                alt="The Kiltan Cafe Emblem"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                The Kiltan Cafe
+              </h2>
+              <p className="text-xs sm:text-sm font-bold text-amber-300">
+                SHOP NO. 34, S.D MARKET, OPPOSITE HOUSING BOARD, KALKA, HARYANA (133302)
+              </p>
+              <p className="text-xs text-stone-300">
+                📞 91385-28287, 99914-28287 • Instagram: @thekiltancafekalka
+              </p>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight max-w-3xl mx-auto leading-tight">
@@ -37,7 +57,7 @@ export default function AboutPage() {
           </h1>
 
           <p className="text-xs sm:text-base text-stone-300 max-w-2xl mx-auto leading-relaxed">
-            Welcome to The Kiltan Cafe. Located at Shop No. 34, S.D Market, Kalka, we set out to create a sanctuary where high quality dining meets affordable, zero-fee everyday eating.
+            Welcome to The Kiltan Cafe. Located at Shop No. 34, S.D Market, Opposite Housing Board, Kalka, we set out to create a sanctuary where high quality dining meets affordable, zero-fee everyday eating.
           </p>
         </div>
       </section>
