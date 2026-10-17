@@ -51,6 +51,10 @@ interface PlacedOrderData {
   customerName: string;
   address: string;
   distanceKm: number;
+  paymentMethod?: string;
+  printUrl?: string;
+  upiUrl?: string;
+  upiQr?: string;
 }
 
 function MenuContent() {
@@ -86,11 +90,52 @@ function MenuContent() {
   const [locationDetecting, setLocationDetecting] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string>("");
 
-  // 1. Fetch live menu dishes from Cloud Database
+  // 1. Fetch live menu dishes from Cloud Database (Synced across Kiltan POS & Delivery)
   useEffect(() => {
     let isMounted = true;
     async function fetchLiveDishes() {
       try {
+        // Try Kiltan Main API first
+        const kiltanRes = await fetch("https://ludhcloud.online/kiltan/api.php?action=get_menu_full", {
+          cache: "no-store"
+        });
+        if (kiltanRes.ok) {
+          const kJson = await kiltanRes.json();
+          if (kJson.status === "success" && Array.isArray(kJson.categories) && kJson.categories.length > 0) {
+            const mapped: MenuItem[] = [];
+            kJson.categories.forEach((cat: any) => {
+              const catName = cat.name || "General";
+              const catSlug = catName.toLowerCase().replace(/[^a-z0-9]/g, "-");
+              if (Array.isArray(cat.items)) {
+                cat.items.forEach((d: any) => {
+                  mapped.push({
+                    id: Number(d.id),
+                    name: d.name,
+                    category: catSlug,
+                    categoryLabel: catName,
+                    isVeg: d.is_veg !== 0 && d.is_veg !== "0",
+                    price: Number(d.price),
+                    originalPrice: d.original_price ? Number(d.original_price) : undefined,
+                    img: d.image_url || d.image || "/images/CHEESE BURGER.jpeg",
+                    desc: d.description || d.desc || "",
+                    isBestseller: Number(d.is_bestseller || 0) === 1 || Number(d.price) > 100,
+                    prepTime: "15-20 min",
+                    isAvailable: d.is_active !== 0 && d.is_active !== false && d.is_active !== "0"
+                  });
+                });
+              }
+            });
+
+            if (mapped.length > 0 && isMounted) {
+              setDishes(mapped);
+              setIsLiveSynced(true);
+              setSyncTimestamp(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+              return;
+            }
+          }
+        }
+
+        // Secondary fallback to delivery endpoint
         const res = await fetch("https://ludhcloud.online/delivery/api/dishes.php", {
           cache: "no-store"
         });
@@ -115,7 +160,7 @@ function MenuContent() {
             if (isMounted) {
               setDishes(mapped);
               setIsLiveSynced(true);
-              setSyncTimestamp(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+              setSyncTimestamp(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
             }
           }
         }
@@ -295,19 +340,28 @@ function MenuContent() {
       };
     });
 
+    const subtotal = traySubtotal;
+    const tax = Math.round(subtotal * 0.05);
+    const grandTotal = subtotal + tax;
+
     const payload = {
       customer_name: custName.trim(),
       customer_phone: custPhone.trim(),
-      address: custAddress.trim(),
+      delivery_address: custAddress.trim(),
+      customer_lat: custCoords.lat,
+      customer_lng: custCoords.lng,
       items: itemsPayload,
+      subtotal: subtotal,
+      tax: tax,
+      delivery_fee: 0,
+      grand_total: grandTotal,
       payment_method: paymentMethod,
-      lat: custCoords.lat,
-      lng: custCoords.lng,
       distance_km: detectedDistance
     };
 
     try {
-      const res = await fetch("https://ludhcloud.online/delivery/api/place_order.php", {
+      // Connect directly to Kiltan Main POS API
+      const res = await fetch("https://ludhcloud.online/kiltan/api.php?action=place_delivery_order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -315,39 +369,53 @@ function MenuContent() {
 
       const data = await res.json();
 
-      if (data.success) {
+      if (data.status === "success" || data.success) {
+        const orderNo = data.order_no || data.order_code || "ORD-" + Math.floor(1000 + Math.random() * 9000);
+        const upiPayUrl = data.upi_url || `upi://pay?pa=9138528287@upi&pn=The%20Kiltan%20Cafe&am=${data.total || grandTotal}&cu=INR&tn=Order%20${orderNo}`;
+        const upiQrImg = data.upi_qr || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPayUrl)}`;
+        const printUrl = data.print_url || `https://ludhcloud.online/kiltan/api.php?action=print_receipt&order_no=${orderNo}&format=html`;
+
         const orderInfo: PlacedOrderData = {
-          orderCode: data.order_code || "IND-" + Math.floor(1000 + Math.random() * 9000),
-          otp: data.otp || "4821",
-          grandTotal: data.grand_total || traySubtotal,
+          orderCode: orderNo,
+          otp: data.delivery_otp || data.otp || "4821",
+          grandTotal: data.total || data.grand_total || grandTotal,
           etaMinutes: data.eta_minutes || Math.max(18, Math.round(detectedDistance * 3.5)),
           customerName: custName,
           address: custAddress,
-          distanceKm: detectedDistance
+          distanceKm: detectedDistance,
+          paymentMethod: paymentMethod,
+          printUrl: printUrl,
+          upiUrl: upiPayUrl,
+          upiQr: upiQrImg
         };
 
         setPlacedOrder(orderInfo);
-        // Persist order code for easy access
+        // Persist order code for easy access across tabs
         if (typeof window !== "undefined") {
           localStorage.setItem("kiltan_active_order", orderInfo.orderCode);
         }
         // Clear order tray
         setOrderTray({});
       } else {
-        alert(data.error || "Order place karne me samasya aayi. Kripya punah prayas karein.");
+        alert(data.message || data.error || "Order place karne me samasya aayi. Kripya punah prayas karein.");
       }
     } catch (err) {
       console.error("Order submission error:", err);
       // Fallback successful simulation
-      const fallbackCode = "IND-" + Math.floor(1000 + Math.random() * 9000);
+      const fallbackCode = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+      const fallbackUpi = `upi://pay?pa=9138528287@upi&pn=The%20Kiltan%20Cafe&am=${grandTotal}&cu=INR&tn=Order%20${fallbackCode}`;
       const orderInfo: PlacedOrderData = {
         orderCode: fallbackCode,
         otp: "3819",
-        grandTotal: traySubtotal,
-        etaMinutes: 25,
+        grandTotal: grandTotal,
+        etaMinutes: 20,
         customerName: custName,
         address: custAddress,
-        distanceKm: detectedDistance
+        distanceKm: detectedDistance,
+        paymentMethod: paymentMethod,
+        printUrl: `https://ludhcloud.online/kiltan/api.php?action=print_receipt&order_no=${fallbackCode}&format=html`,
+        upiUrl: fallbackUpi,
+        upiQr: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(fallbackUpi)}`
       };
       setPlacedOrder(orderInfo);
       setOrderTray({});
@@ -894,7 +962,7 @@ function MenuContent() {
             </div>
 
             {/* Order Code & OTP Box */}
-            <div className="bg-stone-950 p-4 rounded-2xl border border-stone-800 space-y-3">
+            <div className="bg-stone-950 p-4 rounded-2xl border border-stone-800 space-y-2 text-left">
               <div className="flex items-center justify-between border-b border-stone-800 pb-2">
                 <span className="text-xs text-stone-400 font-bold">Order ID:</span>
                 <span className="text-base font-black font-mono text-emerald-400">
@@ -909,16 +977,61 @@ function MenuContent() {
                 </span>
               </div>
 
+              <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                <span className="text-xs text-stone-400 font-bold">Total Amount:</span>
+                <span className="text-sm font-black text-white font-mono">
+                  ₹{placedOrder.grandTotal} ({placedOrder.paymentMethod || "COD"})
+                </span>
+              </div>
+
               <div className="flex items-center justify-between">
                 <span className="text-xs text-stone-400 font-bold">Estimated Delivery:</span>
-                <span className="text-xs font-black text-white">
+                <span className="text-xs font-black text-emerald-300">
                   ~{placedOrder.etaMinutes} Minutes
                 </span>
               </div>
             </div>
 
-            {/* Tracking Button */}
-            <div className="space-y-2 pt-2">
+            {/* UPI QR Payment Box (If UPI or quick payment) */}
+            {placedOrder.upiQr && (
+              <div className="bg-stone-950 p-3.5 rounded-2xl border border-emerald-500/40 space-y-2 text-center">
+                <p className="text-[11px] font-bold text-emerald-400">
+                  📱 Scan QR with GPay / PhonePe / Paytm / BHIM:
+                </p>
+                <div className="flex items-center justify-center py-1">
+                  <img
+                    src={placedOrder.upiQr}
+                    alt="UPI QR Code"
+                    className="w-32 h-32 rounded-xl border-2 border-emerald-400/50 bg-white p-1 shadow-lg"
+                  />
+                </div>
+                <div className="text-[11px] text-stone-300 font-mono">
+                  UPI ID: <span className="text-amber-300 font-bold select-all">9138528287@upi</span>
+                </div>
+                {placedOrder.upiUrl && (
+                  <a
+                    href={placedOrder.upiUrl}
+                    className="inline-block w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow"
+                  >
+                    Open UPI App to Pay ₹{placedOrder.grandTotal}
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Actions: Print Receipt & Live Radar */}
+            <div className="space-y-2 pt-1">
+              {placedOrder.printUrl && (
+                <a
+                  href={placedOrder.printUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 bg-stone-800 hover:bg-stone-700 border border-stone-600 text-stone-200 font-bold text-xs rounded-2xl shadow transition flex items-center justify-center gap-2"
+                >
+                  <span>🖨️ Print Receipt / Download Invoice</span>
+                </a>
+              )}
+
               <Link
                 href={`/delivery?order_code=${encodeURIComponent(placedOrder.orderCode)}`}
                 className="w-full py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2"
@@ -929,7 +1042,7 @@ function MenuContent() {
 
               <button
                 onClick={() => setPlacedOrder(null)}
-                className="w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-bold rounded-2xl transition"
+                className="w-full py-2 bg-transparent hover:bg-stone-800 text-stone-400 hover:text-stone-200 text-xs font-bold rounded-2xl transition"
               >
                 Close & Return to Menu
               </button>

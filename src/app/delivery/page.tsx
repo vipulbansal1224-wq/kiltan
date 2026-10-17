@@ -28,6 +28,12 @@ interface TrackingData {
   step: number;
   eta_minutes: number;
   otp: string;
+  grand_total?: number;
+  payment_method?: string;
+  payment_status?: string;
+  print_url?: string;
+  upi_url?: string;
+  upi_qr?: string;
   store: {
     name: string;
     address: string;
@@ -77,6 +83,23 @@ function DeliveryContent() {
     setTrackingError("");
 
     try {
+      // 1. Try Kiltan Main API first
+      const kRes = await fetch(
+        `https://ludhcloud.online/kiltan/api.php?action=track_order&order_no=${encodeURIComponent(
+          codeToTrack.trim()
+        )}`,
+        { cache: "no-store" }
+      );
+      if (kRes.ok) {
+        const kJson = await kRes.json();
+        if ((kJson.status === "success" || kJson.success) && kJson.data) {
+          setActiveTracking(kJson.data);
+          setLastRefreshed(new Date().toLocaleTimeString());
+          return;
+        }
+      }
+
+      // 2. Secondary fallback to delivery API
       const res = await fetch(
         `https://ludhcloud.online/delivery/api/track_order.php?order_code=${encodeURIComponent(
           codeToTrack.trim()
@@ -89,7 +112,7 @@ function DeliveryContent() {
         setActiveTracking(json.data);
         setLastRefreshed(new Date().toLocaleTimeString());
       } else {
-        setTrackingError("Order nahi mila. Kripya sahi Order Code enter karein (e.g. IND-9482).");
+        setTrackingError("Order nahi mila. Kripya sahi Order Code enter karein (e.g. ORD-0001 ya IND-9482).");
       }
     } catch (err) {
       console.warn("Could not query live radar:", err);
@@ -117,14 +140,14 @@ function DeliveryContent() {
 
     const interval = setInterval(() => {
       fetch(
-        `https://ludhcloud.online/delivery/api/track_order.php?order_code=${encodeURIComponent(
+        `https://ludhcloud.online/kiltan/api.php?action=track_order&order_no=${encodeURIComponent(
           activeTracking.order_code
         )}`,
         { cache: "no-store" }
       )
         .then((r) => r.json())
         .then((json) => {
-          if (json.success && json.data) {
+          if ((json.status === "success" || json.success) && json.data) {
             setActiveTracking(json.data);
             setLastRefreshed(new Date().toLocaleTimeString());
           }
@@ -449,6 +472,39 @@ function DeliveryContent() {
                       {activeTracking.rider.current_lng.toFixed(4)}
                     </span>
                   </div>
+                </div>
+              </div>
+
+              {/* Receipt Print & Digital Payment Bar */}
+              <div className="bg-stone-950 p-4 rounded-2xl border border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-left w-full sm:w-auto">
+                  <span className="text-[10px] font-bold uppercase text-stone-400">Payment & Bill:</span>
+                  <p className="text-xs font-bold text-white">
+                    Status: <span className="text-emerald-400">{activeTracking.payment_status || "Pending"}</span> ({activeTracking.payment_method || "COD"})
+                    {activeTracking.grand_total ? ` • Total: ₹${activeTracking.grand_total}` : ""}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  {activeTracking.print_url && (
+                    <a
+                      href={activeTracking.print_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-stone-800 hover:bg-stone-700 border border-stone-600 text-stone-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow"
+                    >
+                      <span>🖨️ Print Receipt</span>
+                    </a>
+                  )}
+
+                  {activeTracking.upi_url && activeTracking.payment_status !== "Paid" && (
+                    <a
+                      href={activeTracking.upi_url}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow"
+                    >
+                      <span>📱 Pay via UPI</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
