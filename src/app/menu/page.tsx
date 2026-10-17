@@ -187,53 +187,74 @@ function MenuContent() {
   // Auto-detect location
   const handleDetectLocation = async () => {
     setLocationDetecting(true);
-    setLocationStatus("Detecting location via GPS / Network...");
+    setLocationStatus("Locking exact 10-15m GPS satellites...");
 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          const accuracy = pos.coords.accuracy || 12;
           const dist = calcDistanceKm(STORE_LAT, STORE_LNG, lat, lng);
           setCustCoords({ lat, lng });
           setDetectedDistance(dist);
           setLocationDetecting(false);
-          setLocationStatus(`📍 Detected: ${dist} km from Kalka store`);
 
-          if (!custAddress) {
-            setCustAddress(`Current GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-          }
-        },
-        async (err) => {
-          console.warn("Browser GPS declined, falling back to IP locator:", err);
-          // Fallback to ipwho.is
+          let resolvedAddress = "";
+          // Layer 1: BigDataCloud Reverse Geocoding
           try {
-            const res = await fetch("https://ipwho.is/");
-            const data = await res.json();
-            if (data && data.success) {
-              const lat = data.latitude;
-              const lng = data.longitude;
-              const dist = calcDistanceKm(STORE_LAT, STORE_LNG, lat, lng);
-              setCustCoords({ lat, lng });
-              setDetectedDistance(dist);
-              setLocationStatus(`📍 IP Detected: ${data.city || 'Nearby'}, ${dist} km from Kalka`);
-              if (!custAddress) {
-                setCustAddress(`${data.city || 'Local'}, Punjab / Haryana Area`);
+            const bdcRes = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+            );
+            if (bdcRes.ok) {
+              const bdc = await bdcRes.json();
+              const locality = bdc.locality || bdc.city || "";
+              const district = bdc.principalSubdivision || "";
+              if (locality) {
+                resolvedAddress = `${locality}, ${district}`;
               }
-            } else {
-              setLocationStatus("Could not auto-detect. Please enter address manually.");
             }
-          } catch (e) {
-            setLocationStatus("Manual entry required.");
-          } finally {
-            setLocationDetecting(false);
+          } catch (e) {}
+
+          // Layer 2: OpenStreetMap Reverse Geocoding
+          try {
+            const nomRes = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`
+            );
+            if (nomRes.ok) {
+              const nom = await nomRes.json();
+              const a = nom.address || {};
+              const road = a.road || a.pedestrian || a.street || "";
+              const area = a.suburb || a.neighbourhood || a.residential || a.village || "";
+              const city = a.city || a.town || a.county || "";
+              const parts = [];
+              if (road) parts.push(road);
+              if (area && area !== road) parts.push(area);
+              if (city && city !== area) parts.push(city);
+              if (parts.length > 0) {
+                resolvedAddress = parts.join(", ");
+              }
+            }
+          } catch (e) {}
+
+          if (!resolvedAddress) {
+            resolvedAddress = `Exact GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
           }
+
+          setCustAddress(`${resolvedAddress} (GPS: ±${Math.round(accuracy)}m)`);
+          setLocationStatus(`📍 Locked: ${dist} km from Kalka (Accuracy: ±${Math.round(accuracy)}m)`);
         },
-        { timeout: 7000 }
+        (err) => {
+          console.warn("GPS access warning:", err);
+          setLocationDetecting(false);
+          setLocationStatus("📍 Kripya location permission allow karein taaki exact 10-15m address detect ho sake.");
+          alert("Kripya browser me Location Allow karein taaki exact aapki location detect ho sake.");
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
       );
     } else {
       setLocationDetecting(false);
-      setLocationStatus("Geolocation not supported by browser.");
+      setLocationStatus("Geolocation browser me supported nahi hai. Kripya address type karein.");
     }
   };
 
